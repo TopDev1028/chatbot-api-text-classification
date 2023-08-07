@@ -34,6 +34,10 @@
           var question = $("#question").val();
           var response = $("#response").val();
 
+          if ((question == "") | (response == "")) {
+            alert("Please input correctly");
+            return;
+          }
           // Make the AJAX request
           $.ajax({
             type: "POST",

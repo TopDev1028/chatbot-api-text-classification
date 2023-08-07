@@ -8,7 +8,7 @@ import re
 import nltk
 from nltk.sentiment import SentimentIntensityAnalyzer
 
-# nltk.download("vader_lexicon")
+nltk.download("vader_lexicon")
 nltk.data.path.append("/home/TOPTOP/nltk_data")
 
 
@@ -300,8 +300,6 @@ def intent():
 @app.route("/", methods=["GET", "POST"])
 def hello():
     if request.method == "POST":
-        print("Hello")
-        # Get the form data from the request
         question = request.json.get("question")
         response = request.json.get("response")
 
