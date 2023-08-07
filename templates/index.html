@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Intent Checker</title>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <link
+      rel="stylesheet"
+      type="text/css"
+      href="{{ url_for('static', filename='styles.css') }}"
+    />
+  </head>
+  <body>
+    <div class="App">
+      <div class="auth-form-container">
+        <h1>Please check here</h1>
+        <form id="intent-form" class="login-form">
+          <label for="question">Question</label>
+          <select id="question" class="question">
+            <option value="greeting">greeting</option>
+            <option value="medicare">medicare</option>
+          </select>
+          <label for="response">Response</label>
+          <input name="response" id="response" />
+          <button type="button" id="submit-btn">Get Intent</button>
+          <div id="result-container"></div>
+        </form>
+      </div>
+    </div>
+
+    <script>
+      $(document).ready(function () {
+        $("#submit-btn").click(function () {
+          // Get the form values
+          var question = $("#question").val();
+          var response = $("#response").val();
+
+          // Make the AJAX request
+          $.ajax({
+            type: "POST",
+            url: "/",
+            contentType: "application/json",
+            data: JSON.stringify({ question: question, response: response }),
+            success: function (data) {
+              // Display the result in the result-container div
+              var resultContainer = $("#result-container");
+              resultContainer.html(
+                "<h2>Result:</h2><p>" + data.intent + "</p>"
+              );
+            },
+            error: function (error) {
+              console.error("Error:", error);
+            },
+          });
+        });
+      });
+    </script>
+  </body>
+</html>

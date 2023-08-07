@@ -1,11 +1,10 @@
 import time
-from flask import Flask, request
+from flask import Flask, request, render_template, jsonify
 from flask_cors import CORS
 from flask_cors import cross_origin
 import os
 import json
 import re
-
 import nltk
 from nltk.sentiment import SentimentIntensityAnalyzer
 
@@ -296,6 +295,21 @@ def intent():
     intent = assign_intent_with_sentiment(response)
 
     return {"response": response, "intent": intent}
+
+
+@app.route("/", methods=["GET", "POST"])
+def hello():
+    if request.method == "POST":
+        print("Hello")
+        # Get the form data from the request
+        question = request.json.get("question")
+        response = request.json.get("response")
+
+        response = response.replace("'t", " not")
+        intent = assign_intent_with_sentiment(response)
+
+        return jsonify({"intent": intent})
+    return render_template("index.html")
 
 
 if __name__ == "__main__":
