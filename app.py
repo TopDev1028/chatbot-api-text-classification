@@ -14,7 +14,7 @@ nltk.data.path.append("/home/TOPTOP/nltk_data")
 
 import openai
 
-apikey = "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"
+apikey = "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"
 openai.api_key = apikey
 
 json_intents = {
@@ -51,7 +51,6 @@ json_intents = {
         {
             "tag": "no",
             "patterns": [
-                "no",
                 "now",
                 "nope",
                 "I dont want",
@@ -253,60 +252,115 @@ def indentify_dnc(sentence):
     if "no" in sentence and "call" in sentence:
         return True
     return False
+    get_intent_from_question_response
 
 
-def assign_intent_with_sentiment(response):
+def get_intent(question, response):
+    prompt = f"""
+      This is a call for selling medicare insurance. which is for people over 65 year old or people who not 65 but have disability . 
+      so our criteria is to qualify people who have already medicare A, Medicare B or both of them. Or people who have medicaid. 
+      The question is as below.
+      {question}
+      The reponse to my question is below.
+      {response}
+      I want to know what this reponse's intent is by some categories using understanding of the reponse with question-response pair like yes or no.
+      possible answers are below.
+      - yes
+      - no
+      - don't call (dnc)
+
+      Otherwise the category is 'fallback'
+
+      Criteria is:
+
+      Interested people -  yes
+      people who don't want to talk , abuses or want to remove from the list - dnc
+      can't speak english - dnc
+
+      Not interested people - no
+      People don't have medicare - no
+
+      Please give me the category of the reponse.
+      Output must be the following format.
+      { {'intent': 'category'} }
+      """
+
+    response = openai.Completion.create(
+        engine="text-davinci-002",
+        prompt=prompt,
+        max_tokens=100,
+        stop=None,
+        temperature=0.2,
+        n=1,
+        stream=False,
+    )
+    intent = response["choices"][0]["text"].strip()
+
+    return intent
+
+
+def assign_intent_with_sentiment(question, response):
+    # Getting Question and Request
+
+    # Intent Pattern Monitoring
+    if "no problem" in response:
+        return "yes"
     intent = find_intent(response)
+    if intent != "not exist":
+        return intent
 
+    # dnc indentify specifically
     dnc = indentify_dnc(response)
     if dnc == True:
         return "dnc"
-    if intent != "not exist":
-        return intent
+
+    # Sentiment Analysis
     sentiment_score = analyze_sentiment(response)
-    if sentiment_score >= 0.2:
+    if "no problem" in response.lower():
         return "yes"
-    elif sentiment_score <= -0.2:
+    if "not" in response.lower():
         return "no"
-    elif "why" in response:
+    elif sentiment_score >= 0.2:
         return "yes"
-    elif "who" in response:
+    elif "why" in response.lower():
+        return "why"
+    elif "who" in response.lower():
         return "who"
-    elif "later" in response:
+    elif "later" in response.lower():
         return "later"
+    elif "bye" in response.lower():
+        return "no"
+    elif "no" in response.lower():
+        return "no"
     else:
+        intent = get_intent(question, response)
+        intent = intent.replace("'", '"')
+        data = json.loads(intent)
+        intent_value = data["intent"]
+        if intent_value != "fallback":
+            return intent_value
+        if sentiment_score <= -0.2:
+            return "no"
         return "fallback"
 
 
-@app.route("/api/intent", methods=["GET"])
-@cross_origin()
-def intent():
-    question = request.args.get("question")
-    response = request.args.get("response")
-
-    response_temp = response
-
-    question1 = ""
-    if question == "gretting":
-        question1 = gretting_question
-    else:
-        question1 = medicare_question
-    response = response.replace("'t", " not")
-    intent = assign_intent_with_sentiment(response)
-
-    return {"response": response, "intent": intent}
-
-
 @app.route("/", methods=["GET", "POST"])
-def hello():
+def sentiment():
     if request.method == "POST":
-        question = request.json.get("question")
+        question_type = request.json.get("question")
         response = request.json.get("response")
 
-        response = response.replace("'t", " not")
-        intent = assign_intent_with_sentiment(response)
+        response_temp = response
 
-        return jsonify({"intent": intent})
+        question = ""
+        if question_type == "gretting":
+            question = gretting_question
+        else:
+            question = medicare_question
+        response = response.replace("'t", " not")
+        intent = assign_intent_with_sentiment(question, response)
+
+        return jsonify({"response": response_temp, "intent": intent})
     return render_template("index.html")
 
 

@@ -49,6 +49,7 @@ body {
     padding:1rem;
     border: none;
     border-radius: 10px;
+    font-size: 20px;
   }
   
   button {
@@ -58,15 +59,23 @@ body {
     border-radius:10px;
     cursor: pointer;
     color:#7439db;
+    font-size: 20px;
   }
   
   .link-btn {
     background: none;
     color: white;
     text-decoration: underline;
+    font-size: 20px;
   }
 
   .question {
     padding: 15px;
     border-radius: 10px;
+    font-size: 20px;
+    border: none;
+  }
+
+  .option {
+    padding: 10px;
   }

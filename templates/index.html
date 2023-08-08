@@ -16,13 +16,16 @@
         <form id="intent-form" class="login-form">
           <label for="question">Question</label>
           <select id="question" class="question">
-            <option value="greeting">greeting</option>
-            <option value="medicare">medicare</option>
+            <option value="greeting" class="option">greeting</option>
+            <option value="medicare" class="option">medicare</option>
           </select>
           <label for="response">Response</label>
           <input name="response" id="response" />
           <button type="button" id="submit-btn">Get Intent</button>
-          <div id="result-container"></div>
+          <div id="result-container">
+            <h2>Result:</h2>
+            <p><br /></p>
+          </div>
         </form>
       </div>
     </div>
