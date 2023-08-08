@@ -9,6 +9,7 @@ import nltk
 from nltk.sentiment import SentimentIntensityAnalyzer
 
 nltk.download("vader_lexicon")
+sid = SentimentIntensityAnalyzer()
 
 import openai
 
@@ -228,7 +229,6 @@ medicare_question = "I’m calling because the updated plan for Medicare has bee
 
 
 def analyze_sentiment(text):
-    sid = SentimentIntensityAnalyzer()
     sentiment_score = sid.polarity_scores(text)
     return sentiment_score["compound"]
 
