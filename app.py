@@ -349,6 +349,7 @@ def sentiment():
     if request.method == "POST":
         question_type = request.json.get("question")
         response = request.json.get("response")
+        print(response)
 
         response_temp = response
 
