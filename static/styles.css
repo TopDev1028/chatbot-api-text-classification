@@ -79,3 +79,7 @@ body {
   .option {
     padding: 10px;
   }
+
+  .result {
+    color:blue
+  }

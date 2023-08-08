@@ -9,12 +9,10 @@ import nltk
 from nltk.sentiment import SentimentIntensityAnalyzer
 
 nltk.download("vader_lexicon")
-nltk.data.path.append("/home/TOPTOP/nltk_data")
-
 
 import openai
 
-apikey = "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"
+apikey = "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"
 openai.api_key = apikey
 
 json_intents = {
@@ -301,11 +299,11 @@ def get_intent(question, response):
 
 def assign_intent_with_sentiment(question, response):
     # Getting Question and Request
-
+    lower = response.lower()
     # Intent Pattern Monitoring
-    if "no problem" in response:
+    if "no problem" in lower:
         return "yes"
-    intent = find_intent(response)
+    intent = find_intent(lower)
     if intent != "not exist":
         return intent
 
@@ -315,25 +313,25 @@ def assign_intent_with_sentiment(question, response):
         return "dnc"
 
     # Sentiment Analysis
-    sentiment_score = analyze_sentiment(response)
-    if "no problem" in response.lower():
+    sentiment_score = analyze_sentiment(lower)
+    if "no problem" in lower:
         return "yes"
-    if "not" in response.lower():
+    if "not" in lower:
         return "no"
     elif sentiment_score >= 0.2:
         return "yes"
-    elif "why" in response.lower():
+    elif "why" in lower:
         return "why"
-    elif "who" in response.lower():
+    elif "who" in lower:
         return "who"
-    elif "later" in response.lower():
+    elif "later" in lower:
         return "later"
-    elif "bye" in response.lower():
+    elif "bye" in lower:
         return "no"
-    elif "no" in response.lower():
+    elif "no" in lower:
         return "no"
     else:
-        intent = get_intent(question, response)
+        intent = get_intent(question, lower)
         intent = intent.replace("'", '"')
         data = json.loads(intent)
         intent_value = data["intent"]
@@ -365,4 +363,4 @@ def sentiment():
 
 
 if __name__ == "__main__":
-    app.run(host="0.0.0.0", port=2000, debug=True)
+    app.run(host="0.0.0.0", port=5000, debug=True)
