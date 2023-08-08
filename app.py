@@ -12,7 +12,7 @@ nltk.download("vader_lexicon")
 
 import openai
 
-apikey = "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"
+apikey = "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"
 openai.api_key = apikey
 
 json_intents = {
@@ -170,6 +170,7 @@ json_intents = {
                 "sure",
                 "yeah",
                 "great",
+                "how are you",
                 "ah yes",
                 "correct",
                 "oh fine",
@@ -316,6 +317,10 @@ def assign_intent_with_sentiment(question, response):
     sentiment_score = analyze_sentiment(lower)
     if "no problem" in lower:
         return "yes"
+    elif "bye" in lower:
+        return "no"
+    elif "later" in lower:
+        return "later"
     if "not" in lower:
         return "no"
     elif sentiment_score >= 0.2:
@@ -324,14 +329,11 @@ def assign_intent_with_sentiment(question, response):
         return "why"
     elif "who" in lower:
         return "who"
-    elif "later" in lower:
-        return "later"
-    elif "bye" in lower:
-        return "no"
     elif "no" in lower:
         return "no"
     else:
         intent = get_intent(question, lower)
+        print(intent)
         intent = intent.replace("'", '"')
         data = json.loads(intent)
         intent_value = data["intent"]
