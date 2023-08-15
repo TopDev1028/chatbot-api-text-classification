@@ -367,5 +367,25 @@ def sentiment():
     return render_template("index.html")
 
 
+@app.route("/api", methods=["GET"])
+def sentiment1():
+    question_type = request.args.get("question")
+    response = request.args.get("response")
+    if question_type != "" and response != "":
+        response_temp = response
+
+        question = ""
+        if question_type == "greeting":
+            question = gretting_question
+        else:
+            question = medicare_question
+        response = response.replace("'t", " not")
+        intent = assign_intent_with_sentiment(question, response)
+
+        return jsonify({"response": response_temp, "intent": intent})
+    else:
+        return "Please input exactly."
+
+
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=5000, debug=True)
