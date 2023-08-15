@@ -7,13 +7,16 @@ import json
 import re
 import nltk
 from nltk.sentiment import SentimentIntensityAnalyzer
+from dotenv import load_dotenv
 
+
+load_dotenv()
 nltk.download("vader_lexicon")
 sid = SentimentIntensityAnalyzer()
 
 import openai
 
-apikey = "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"
+apikey = os.getenv("API_KEY")
 openai.api_key = apikey
 
 json_intents = {
@@ -124,7 +127,6 @@ json_intents = {
                 "tell me about company ",
                 "what you guys do",
                 "hello",
-                "hi",
                 "oh hi",
                 "oh hello",
                 "hi there",
@@ -134,8 +136,6 @@ json_intents = {
                 "sorry what",
                 "what is this",
                 "what",
-                "mm",
-                "hmm",
                 "more",
                 "who",
                 "who are you calling",
@@ -225,7 +225,7 @@ app = Flask(__name__)
 CORS(app)
 
 gretting_question = "Hi this is name from healthcare benefit. How are you today?"
-medicare_question = "I’m calling because the updated plan for Medicare has been released and it may give you some better access to things like dental vision hearing and over-the-counter benefits. Now I believe you do have Medicare part a and B correct?"
+medicare_question = "I'm calling because the updated plan for Medicare has been released and it may give you some better access to things like dental vision hearing and over-the-counter benefits. Now I believe you do have Medicare part a and B correct?"
 
 
 def analyze_sentiment(text):
@@ -317,6 +317,8 @@ def assign_intent_with_sentiment(question, response):
     sentiment_score = analyze_sentiment(lower)
     if "no problem" in lower:
         return "yes"
+    if "hi" == lower:
+        return "who"
     elif "bye" in lower:
         return "no"
     elif "later" in lower:
