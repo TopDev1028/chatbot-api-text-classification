@@ -16,7 +16,7 @@ sid = SentimentIntensityAnalyzer()
 
 import openai
 
-apikey = os.getenv("API_KEY")
+apikey = ""
 openai.api_key = apikey
 
 json_intents = {
