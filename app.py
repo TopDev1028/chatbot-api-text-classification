@@ -8,7 +8,7 @@ import re
 import nltk
 from nltk.sentiment import SentimentIntensityAnalyzer
 from dotenv import load_dotenv
-
+from langdetect import detect
 
 load_dotenv()
 nltk.download("vader_lexicon")
@@ -16,42 +16,53 @@ sid = SentimentIntensityAnalyzer()
 
 import openai
 
-apikey = ""
+apikey = os.environ["API_KEY"]
 openai.api_key = apikey
 
 json_intents = {
     "intents": [
         {
-            "tag": "dnc",
+            "tag": "AM",
             "patterns": [
-                "fuck off",
-                "stop calling",
-                "stop calling me",
-                "get the fuck out, I do not want you talking to me",
-                "you're an idiot, who the fuck care if you live or die, go to hell",
-                "scammers",
-                "don't be a fool",
-                "leave me alone, I do not want your calls anymore",
-                "go to hell",
-                "shut up",
-                "take me off your list",
-                "not interested",
-                "no i d like for you not to call me ever again",
-                "nope i ve gotten insurance",
-                "take me off the list how about that",
-                "fucker",
-                "mother fucker",
-                "fuck yourself",
-                "bitch",
-                "whore",
-                "suck my dick",
-                "dick",
+                "a message after the tone press the pound key to end recording",
+                "a message or hit zero for the operator thank you",
+                "a pound for employment verifications press one",
+                "according out the tone when finished press the pound key",
+                "a hang up or press one for more options",
+                "so these are some questions for AM scenario",
+                "let me know if you have any other questions",
             ],
-            "responses": ["ok I'll put you on dnc list"],
+            "responses": ["You are a answering machine or voice mail"],
             "context": [""],
         },
         {
-            "tag": "no",
+            "tag": "LB",
+            "patterns": [
+                "I don't know English",
+                "Let's speak in other language.",
+            ],
+            "responses": ["We haver language barrier"],
+            "context": [""],
+        },
+        {
+            "tag": "CB",
+            "patterns": [
+                "later",
+                "yes later",
+                "some other time",
+                "i am driving",
+                "can not hear your voice",
+                "can not hear voice",
+            ],
+            "responses": [
+                "sure i will schedule a callback later. thanks bye",
+                "ok later we can do it. thanks bye",
+                "ok some other time.thanks bye",
+            ],
+            "context": [""],
+        },
+        {
+            "tag": "NO",
             "patterns": [
                 "now",
                 "nope",
@@ -109,63 +120,52 @@ json_intents = {
                 "i got a plan",
                 "no not at all",
                 "speak to a sales associate press two",
+                "why the hell you are calling me now i am busy",
+                "i already have insurance",
+                "already have insurance",
+                "no need insurance",
+                "not interested at the moment",
             ],
             "responses": ["ok thanks for your time, have a great day"],
             "context": [""],
         },
         {
-            "tag": "who",
+            "tag": "DNC",
             "patterns": [
-                "who are you",
-                "what is your name",
-                "what is your company name",
-                "who is this",
-                "tell me about you",
-                "what's your company name",
-                "from where you are calling",
-                "which company you are from",
-                "tell me about company ",
-                "what you guys do",
-                "hello",
-                "oh hi",
-                "oh hello",
-                "hi there",
-                "i can't hear you",
-                "what are you saying",
-                "can you repeat",
-                "sorry what",
-                "what is this",
-                "what",
-                "more",
-                "who",
-                "who are you calling",
+                "fuck off",
+                "stop calling",
+                "stop calling me",
+                "get the fuck out, I do not want you talking to me",
+                "you're an idiot, who the fuck care if you live or die, go to hell",
+                "scammers",
+                "don't be a fool",
+                "leave me alone, I do not want your calls anymore",
+                "go to hell",
+                "shut up",
+                "take me off your list",
+                "not interested",
+                "no i d like for you not to call me ever again",
+                "nope i ve gotten insurance",
+                "take me off the list how about that",
+                "fucker",
+                "mother fucker",
+                "fuck yourself",
+                "bitch",
+                "whore",
+                "suck my dick",
+                "dick",
             ],
-            "responses": ["My name is Amy and I am calling from healthcare"],
+            "responses": ["ok I'll put you on dnc list"],
             "context": [""],
         },
         {
-            "tag": "why",
-            "patterns": [
-                "why are you calling me",
-                "why",
-                "what is purpose",
-                "what can i do for you",
-                "what a disregard",
-                "what is this regarding",
-                "what is this about",
-            ],
-            "responses": ["I am calling you about health insurance"],
-            "context": [""],
-        },
-        {
-            "tag": "yes",
+            "tag": "YES",
             "patterns": [
                 "yes",
                 "yes",
                 "cool",
                 "cool",
                 "fine",
-                "good",
                 "more",
                 "okay",
                 "sure",
@@ -199,21 +199,43 @@ json_intents = {
                 "i'm fine what you need",
                 "not too bad how are you",
                 "i'm fine what do you need",
+                "who are you",
+                "what is your name",
+                "what is your company name",
+                "who is this",
+                "tell me about you",
+                "what's your company name",
+                "from where you are calling",
+                "which company you are from",
+                "tell me about company ",
+                "what you guys do",
+                "hello",
+                "oh hi",
+                "oh hello",
+                "hi there",
+                "i can't hear you",
+                "what are you saying",
+                "can you repeat",
+                "sorry what",
+                "what is this",
+                "what",
+                "more",
+                "who",
+                "who are you calling",
+                "why are you calling me",
+                "why",
+                "what is purpose",
+                "what can i do for you",
+                "what a disregard",
+                "what is this regarding",
+                "what is this about",
+                "where",
+                "where are you from",
             ],
             "responses": [
                 "ok please hold while i transfer your call",
                 "ok transferring your call to enrollment specialist",
                 "ok wait while i connect to you for more options",
-            ],
-            "context": [""],
-        },
-        {
-            "tag": "later",
-            "patterns": ["later", "yes later", "some other time"],
-            "responses": [
-                "Sure i will schedule a callback later. thanks bye",
-                "ok later we can do it. thanks bye",
-                "ok some other time.thanks bye",
             ],
             "context": [""],
         },
@@ -254,6 +276,11 @@ def indentify_dnc(sentence):
     get_intent_from_question_response
 
 
+def is_english_string(input_string):
+    english_chars = re.compile(r"^[a-zA-Z0-9\s]+$")
+    return bool(english_chars.match(input_string))
+
+
 def get_intent(question, response):
     prompt = f"""
       This is a call for selling medicare insurance. which is for people over 65 year old or people who not 65 but have disability . 
@@ -264,20 +291,22 @@ def get_intent(question, response):
       {response}
       I want to know what this reponse's intent is by some categories using understanding of the reponse with question-response pair like yes or no.
       possible answers are below.
-      - yes
-      - no
-      - don't call (dnc)
+      - YES
+      - NO
+      - don't call (DNC)
+      - call back again (CB)
 
-      Otherwise the category is 'fallback'
+      Otherwise the category is 'FALLBACK'
 
       Criteria is:
 
-      Interested people -  yes
-      people who don't want to talk , abuses or want to remove from the list - dnc
-      can't speak english - dnc
+      Interested people -  YES
+      people who don't want to talk , abuses or want to remove from the list - DNC
+      can't speak english - LB
 
-      Not interested people - no
-      People don't have medicare - no
+      Not interested people - NO
+      People don't have medicare - NO
+      age group barrier - NO
 
       Please give me the category of the reponse.
       Output must be the following format.
@@ -300,10 +329,14 @@ def get_intent(question, response):
 
 def assign_intent_with_sentiment(question, response):
     # Getting Question and Request
+    if is_english_string(response) == False:
+        return "LB"
     lower = response.lower()
     # Intent Pattern Monitoring
     if "no problem" in lower:
-        return "yes"
+        return "YES"
+    elif "later" in lower:
+        return "CB"
     intent = find_intent(lower)
     if intent != "not exist":
         return intent
@@ -311,28 +344,20 @@ def assign_intent_with_sentiment(question, response):
     # dnc indentify specifically
     dnc = indentify_dnc(response)
     if dnc == True:
-        return "dnc"
+        return "DNC"
 
     # Sentiment Analysis
     sentiment_score = analyze_sentiment(lower)
-    if "no problem" in lower:
-        return "yes"
     if "hi" == lower:
-        return "who"
+        return "YES"
     elif "bye" in lower:
-        return "no"
-    elif "later" in lower:
-        return "later"
+        return "NO"
     if "not" in lower:
-        return "no"
+        return "NO"
     elif sentiment_score >= 0.2:
-        return "yes"
-    elif "why" in lower:
-        return "why"
-    elif "who" in lower:
-        return "who"
+        return "YES"
     elif "no" in lower:
-        return "no"
+        return "NO"
     else:
         intent = get_intent(question, lower)
         print(intent)
