@@ -34,6 +34,7 @@ json_intents = {
                 "this is",
                 "this is police department",
                 "this is hospital",
+                "person unavailable",
             ],
             "responses": ["You are a answering machine or voice mail"],
             "context": [""],
@@ -61,6 +62,7 @@ json_intents = {
                 "i might be available",
                 "i might available",
                 "i might availble later",
+                "after",
             ],
             "responses": [
                 "sure i will schedule a callback later. thanks bye",
@@ -241,6 +243,8 @@ json_intents = {
                 "where are you from",
                 "can i apply for insurance my age is 60",
                 "my age is 60 can i apply",
+                "montly cost",
+                "is there",
             ],
             "responses": [
                 "ok please hold while i transfer your call",
@@ -389,6 +393,13 @@ def assign_intent_with_sentiment(question, response):
         return "fallback"
 
 
+def remove_sentence_symbols(input_string):
+    sentence_symbols = [".", "!", "?"]
+    for symbol in sentence_symbols:
+        input_string = input_string.replace(symbol, "")
+    return input_string
+
+
 @app.route("/", methods=["GET", "POST"])
 def sentiment():
     if request.method == "POST":
@@ -403,6 +414,7 @@ def sentiment():
             question = gretting_question
         else:
             question = medicare_question
+        response = remove_sentence_symbols(response)
         response = response.replace("'t", " not")
         intent = assign_intent_with_sentiment(question, response)
 
