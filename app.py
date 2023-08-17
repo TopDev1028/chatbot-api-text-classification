@@ -8,7 +8,7 @@ import re
 import nltk
 from nltk.sentiment import SentimentIntensityAnalyzer
 from dotenv import load_dotenv
-from langdetect import detect
+
 
 load_dotenv()
 nltk.download("vader_lexicon")
@@ -31,6 +31,9 @@ json_intents = {
                 "a hang up or press one for more options",
                 "so these are some questions for AM scenario",
                 "let me know if you have any other questions",
+                "this is",
+                "this is police department",
+                "this is hospital",
             ],
             "responses": ["You are a answering machine or voice mail"],
             "context": [""],
@@ -39,7 +42,9 @@ json_intents = {
             "tag": "LB",
             "patterns": [
                 "I don't know English",
-                "Let's speak in other language.",
+                "let's speak in other language.",
+                "speak in",
+                "cant understand your language",
             ],
             "responses": ["We haver language barrier"],
             "context": [""],
@@ -53,6 +58,9 @@ json_intents = {
                 "i am driving",
                 "can not hear your voice",
                 "can not hear voice",
+                "i might be available",
+                "i might available",
+                "i might availble later",
             ],
             "responses": [
                 "sure i will schedule a callback later. thanks bye",
@@ -231,6 +239,8 @@ json_intents = {
                 "what is this about",
                 "where",
                 "where are you from",
+                "can i apply for insurance my age is 60",
+                "my age is 60 can i apply",
             ],
             "responses": [
                 "ok please hold while i transfer your call",
@@ -283,7 +293,7 @@ def is_english_string(input_string):
 
 def get_intent(question, response):
     prompt = f"""
-      This is a call for selling medicare insurance. which is for people over 65 year old or people who not 65 but have disability . 
+      This is a call for selling medicare insurance. which is for people over 60 year old or people who not 60 but have disability . 
       so our criteria is to qualify people who have already medicare A, Medicare B or both of them. Or people who have medicaid. 
       The question is as below.
       {question}
@@ -303,6 +313,10 @@ def get_intent(question, response):
       Interested people -  YES
       people who don't want to talk , abuses or want to remove from the list - DNC
       can't speak english - LB
+      want to speak in other language instead of english - LB
+      the man's age is less than 60 - NO
+      the man's age is over than 60 - YES
+      less than 60 but have disability - YES
 
       Not interested people - NO
       People don't have medicare - NO
@@ -332,6 +346,10 @@ def assign_intent_with_sentiment(question, response):
     if is_english_string(response) == False:
         return "LB"
     lower = response.lower()
+    if " cant " in response:
+        response.replace(" cant ", " can not ")
+        # if "my age is " in response:
+        #     response.
     # Intent Pattern Monitoring
     if "no problem" in lower:
         return "YES"
