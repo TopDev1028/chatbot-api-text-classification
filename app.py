@@ -66,6 +66,8 @@ json_intents = {
                 "after",
                 "but not now",
                 "might be need",
+                "i am on ",
+                "please call at",
             ],
             "responses": [
                 "sure i will schedule a callback later. thanks bye",
@@ -102,8 +104,7 @@ json_intents = {
                 "press seven",
                 "press eight",
                 "press nine",
-                " bot "
-                "no i m all set",
+                " bot " "no i m all set",
                 "if you re satisfied with the message",
                 "one for more options",
                 "i m busy righs now",
@@ -140,6 +141,7 @@ json_intents = {
                 "no need insurance",
                 "not interested at the moment",
                 "a fine singer",
+                "not need insurance",
             ],
             "responses": ["ok thanks for your time, have a great day"],
             "context": [""],
@@ -169,6 +171,7 @@ json_intents = {
                 "whore",
                 "suck my dick",
                 "dick",
+                "fuck",
             ],
             "responses": ["ok I'll put you on dnc list"],
             "context": [""],
@@ -252,6 +255,7 @@ json_intents = {
                 "my age is 60 can i apply",
                 "montly cost",
                 "is there",
+                "i need insurance",
             ],
             "responses": [
                 "ok please hold while i transfer your call",
@@ -322,6 +326,7 @@ def get_intent(question, response):
       Criteria is:
 
       Interested people -  YES
+      need insurance - YES
       people who is kidding bot - NO
       people who don't want to talk , abuses or want to remove from the list - DNC
       can't speak english - LB
