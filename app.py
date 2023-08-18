@@ -35,6 +35,7 @@ json_intents = {
                 "this is police department",
                 "this is hospital",
                 "person unavailable",
+                "press",
             ],
             "responses": ["You are a answering machine or voice mail"],
             "context": [""],
@@ -63,6 +64,8 @@ json_intents = {
                 "i might available",
                 "i might availble later",
                 "after",
+                "but not now",
+                "might be need",
             ],
             "responses": [
                 "sure i will schedule a callback later. thanks bye",
@@ -99,6 +102,7 @@ json_intents = {
                 "press seven",
                 "press eight",
                 "press nine",
+                " bot "
                 "no i m all set",
                 "if you re satisfied with the message",
                 "one for more options",
@@ -135,6 +139,7 @@ json_intents = {
                 "already have insurance",
                 "no need insurance",
                 "not interested at the moment",
+                "a fine singer",
             ],
             "responses": ["ok thanks for your time, have a great day"],
             "context": [""],
@@ -180,6 +185,8 @@ json_intents = {
                 "okay",
                 "sure",
                 "yeah",
+                "how much",
+                "how",
                 "great",
                 "how are you",
                 "ah yes",
@@ -310,11 +317,12 @@ def get_intent(question, response):
       - don't call (DNC)
       - call back again (CB)
 
-      Otherwise the category is 'FALLBACK'
+      Otherwise the category is 'NO'
 
       Criteria is:
 
       Interested people -  YES
+      people who is kidding bot - NO
       people who don't want to talk , abuses or want to remove from the list - DNC
       can't speak english - LB
       want to speak in other language instead of english - LB

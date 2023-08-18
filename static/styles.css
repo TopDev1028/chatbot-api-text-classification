@@ -83,3 +83,8 @@ body {
   .result {
     color:blue
   }
+
+  #loading {
+    margin-top: -50px;
+    visibility:hidden;
+  }
