@@ -68,6 +68,7 @@ json_intents = {
                 "might be need",
                 "i am on ",
                 "please call at",
+                "call at",
             ],
             "responses": [
                 "sure i will schedule a callback later. thanks bye",
