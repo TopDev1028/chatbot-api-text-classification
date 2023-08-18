@@ -51,6 +51,10 @@
 
           $("#loading").css("visibility", "visible");
           $("#loading").css("margin-top", "20px");
+          $("#submit-btn").prop("disabled", true);
+          $("#submit-btn")
+            .css("background-color", "green")
+            .text("Don't click. It is disabled");
           // Make the AJAX request
           $.ajax({
             type: "POST",
@@ -62,7 +66,10 @@
               var resultContainer = $("#result-container");
               $("#loading").css("visibility", "hidden");
               $("#loading").css("margin-top", "-50px");
-
+              $("#submit-btn").prop("disabled", false);
+              $("#submit-btn")
+                .css("background-color", "white")
+                .text("Get Intent");
               resultContainer.html(
                 "<h2>Result:</h2><p>" + data.intent + "</p>"
               );
