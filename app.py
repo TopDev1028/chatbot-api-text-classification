@@ -145,6 +145,8 @@ json_intents = {
                 "not interested at the moment",
                 "a fine singer",
                 "not need insurance",
+                "not have medicare",
+                "do not need insurance",
             ],
             "responses": ["ok thanks for your time, have a great day"],
             "context": [""],
@@ -260,6 +262,16 @@ json_intents = {
                 "montly cost",
                 "is there",
                 "i need insurance",
+                "already have medicare",
+                "i have part",
+                "i have part a",
+                "i have part b",
+                "i have both",
+                "yes I have",
+                "i have medicare",
+                "i think i have ",
+                "not too bad",
+                "need insurance",
             ],
             "responses": [
                 "ok please hold while i transfer your call",
@@ -370,6 +382,7 @@ def get_intent(question, response):
 
       Interested people -  YES
       need insurance - YES
+      have medicare - YES
       have disability - YES
       people who is kidding bot - NO
       people who don't want to talk , abuses or want to remove from the list - DNC
@@ -403,6 +416,7 @@ def assign_intent_with_sentiment(question, response):
     # Getting Question and Request
     if " cant " in response:
         response.replace(" cant ", " can not ")
+    response.replace("'ve", " have")
 
     if is_english_string(response) == False:
         return "LB"
