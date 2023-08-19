@@ -9,7 +9,6 @@ import nltk
 from nltk.sentiment import SentimentIntensityAnalyzer
 from dotenv import load_dotenv
 
-
 load_dotenv()
 nltk.download("vader_lexicon")
 sid = SentimentIntensityAnalyzer()
@@ -69,6 +68,9 @@ json_intents = {
                 "i am on ",
                 "please call at",
                 "call at",
+                "i am working",
+                "am driving",
+                "am working",
             ],
             "responses": [
                 "sure i will schedule a callback later. thanks bye",
@@ -180,6 +182,7 @@ json_intents = {
         {
             "tag": "YES",
             "patterns": [
+                "have disability",
                 "yes",
                 "yes",
                 "cool",
@@ -307,7 +310,46 @@ def is_english_string(input_string):
     return bool(english_chars.match(input_string))
 
 
+def get_age(response):
+    prompt = f"""
+      Your task is to find out the age from the following sentence. if the age is not mentioned in the following sentence, the answer is 'not mentioned'.
+      {response}
+    """
+    res = openai.Completion.create(
+        engine="text-davinci-002",
+        prompt=prompt,
+        max_tokens=100,
+        stop=None,
+        temperature=0.2,
+        n=1,
+        stream=False,
+    )
+    intent = res["choices"][0]["text"].strip()
+    return intent
+
+
+def get_disability(response):
+    prompt = f"""
+      Your task is to find out the man who is speaking the following sentence have disability or not. 
+      if have disbility, the answer is 'YES', if else, the answer is 'NO'.
+      sentence: {response}
+    """
+    res = openai.Completion.create(
+        engine="text-davinci-002",
+        prompt=prompt,
+        max_tokens=100,
+        stop=None,
+        temperature=0.2,
+        n=1,
+        stream=False,
+    )
+    intent = res["choices"][0]["text"].strip()
+    return intent
+
+
 def get_intent(question, response):
+    answer = get_age(response)
+
     prompt = f"""
       This is a call for selling medicare insurance. which is for people over 60 year old or people who not 60 but have disability . 
       so our criteria is to qualify people who have already medicare A, Medicare B or both of them. Or people who have medicaid. 
@@ -323,22 +365,20 @@ def get_intent(question, response):
       - call back again (CB)
 
       Otherwise the category is 'NO'
-
+    
       Criteria is:
 
       Interested people -  YES
       need insurance - YES
+      have disability - YES
       people who is kidding bot - NO
       people who don't want to talk , abuses or want to remove from the list - DNC
       can't speak english - LB
       want to speak in other language instead of english - LB
-      the man's age is less than 60 - NO
-      the man's age is over than 60 - YES
-      less than 60 but have disability - YES
 
       Not interested people - NO
       People don't have medicare - NO
-      age group barrier - NO
+      age group barrier - AG
 
       Please give me the category of the reponse.
       Output must be the following format.
@@ -361,18 +401,21 @@ def get_intent(question, response):
 
 def assign_intent_with_sentiment(question, response):
     # Getting Question and Request
+    if " cant " in response:
+        response.replace(" cant ", " can not ")
+
     if is_english_string(response) == False:
         return "LB"
     lower = response.lower()
-    if " cant " in response:
-        response.replace(" cant ", " can not ")
-        # if "my age is " in response:
-        #     response.
+
     # Intent Pattern Monitoring
     if "no problem" in lower:
         return "YES"
     elif "later" in lower:
         return "CB"
+    # elif "have disability" in lower:
+    #     return "YES"
+
     intent = find_intent(lower)
     if intent != "not exist":
         return intent
@@ -395,8 +438,16 @@ def assign_intent_with_sentiment(question, response):
     elif "no" in lower:
         return "NO"
     else:
+        # Getting age
+        answer = get_age(response)
+        if answer != "not mentioned":
+            age = int(answer)
+            if age >= 60:
+                return "YES"
+        if get_disability(response) == "YES":
+            return "YES"
+
         intent = get_intent(question, lower)
-        print(intent)
         intent = intent.replace("'", '"')
         data = json.loads(intent)
         intent_value = data["intent"]
@@ -408,7 +459,7 @@ def assign_intent_with_sentiment(question, response):
 
 
 def remove_sentence_symbols(input_string):
-    sentence_symbols = [".", "!", "?"]
+    sentence_symbols = [".", "!", "?", ","]
     for symbol in sentence_symbols:
         input_string = input_string.replace(symbol, "")
     return input_string
@@ -431,6 +482,7 @@ def sentiment():
         response = remove_sentence_symbols(response)
         response = response.replace("'t", " not")
         intent = assign_intent_with_sentiment(question, response)
+        print(intent)
 
         return jsonify({"response": response_temp, "intent": intent})
     return render_template("index.html")
