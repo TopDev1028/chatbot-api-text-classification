@@ -39,8 +39,9 @@
 
     <script>
       $(document).ready(function () {
-        $("#submit-btn").click(function () {
+        function onSubmit(event) {
           // Get the form values
+          event.preventDefault();
           var question = $("#question").val();
           var response = $("#response").val();
 
@@ -78,6 +79,14 @@
               console.error("Error:", error);
             },
           });
+        }
+        $("#submit-btn").click(function (event) {
+          onSubmit(event);
+        });
+        $("#response").keypress(function (event) {
+          if (event.which === 13) {
+            onSubmit(event);
+          }
         });
       });
     </script>

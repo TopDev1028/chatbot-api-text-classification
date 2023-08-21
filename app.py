@@ -9,294 +9,33 @@ import nltk
 from nltk.sentiment import SentimentIntensityAnalyzer
 from dotenv import load_dotenv
 
+# NLTK's Pretrained Model import
 load_dotenv()
 nltk.download("vader_lexicon")
 sid = SentimentIntensityAnalyzer()
 
 import openai
 
+# Openai Environment Setting
 apikey = os.environ["API_KEY"]
 openai.api_key = apikey
 
-json_intents = {
-    "intents": [
-        {
-            "tag": "AM",
-            "patterns": [
-                "a message after the tone press the pound key to end recording",
-                "a message or hit zero for the operator thank you",
-                "a pound for employment verifications press one",
-                "according out the tone when finished press the pound key",
-                "a hang up or press one for more options",
-                "so these are some questions for AM scenario",
-                "let me know if you have any other questions",
-                "this is",
-                "this is police department",
-                "this is hospital",
-                "person unavailable",
-                "press",
-            ],
-            "responses": ["You are a answering machine or voice mail"],
-            "context": [""],
-        },
-        {
-            "tag": "LB",
-            "patterns": [
-                "I don't know English",
-                "let's speak in other language.",
-                "speak in",
-                "cant understand your language",
-            ],
-            "responses": ["We haver language barrier"],
-            "context": [""],
-        },
-        {
-            "tag": "CB",
-            "patterns": [
-                "later",
-                "yes later",
-                "some other time",
-                "i am driving",
-                "can not hear your voice",
-                "can not hear voice",
-                "i might be available",
-                "i might available",
-                "i might availble later",
-                "after",
-                "but not now",
-                "might be need",
-                "i am on ",
-                "please call at",
-                "call at",
-                "i am working",
-                "am driving",
-                "am working",
-            ],
-            "responses": [
-                "sure i will schedule a callback later. thanks bye",
-                "ok later we can do it. thanks bye",
-                "ok some other time.thanks bye",
-            ],
-            "context": [""],
-        },
-        {
-            "tag": "NO",
-            "patterns": [
-                "now",
-                "nope",
-                "I dont want",
-                "nah",
-                "no thank you",
-                "i don't think so",
-                "no i dont want",
-                "i do not want",
-                "i dont want",
-                "not interested",
-                "cannot",
-                "you cannot",
-                "No I am not interested in whatever you're selling",
-                "never",
-                "satisfied with your message",
-                "i have it",
-                "press one",
-                "press two",
-                "press three",
-                "press four",
-                "press five",
-                "press six",
-                "press seven",
-                "press eight",
-                "press nine",
-                " bot " "no i m all set",
-                "if you re satisfied with the message",
-                "one for more options",
-                "i m busy righs now",
-                "you may hang up or across the county for more options",
-                "if you are satisfied with your message press one to listen to your message press two to erase and re record press three to continue recording where you left off press four",
-                "damn",
-                "the pound key",
-                "just hang up",
-                "already have a plan",
-                "i m sorry",
-                "i know",
-                "this is a business",
-                "excuse me",
-                "i don't think i qualify",
-                "i don't think",
-                "we won t be shown",
-                "i'm covered",
-                "i don't need none",
-                "mm no",
-                "mm mm no",
-                "english",
-                "i don't speak english",
-                "i can't talk in english",
-                "no english",
-                "sorry no",
-                "wow",
-                "i gotta find it on my own",
-                "i got a plan",
-                "no not at all",
-                "speak to a sales associate press two",
-                "why the hell you are calling me now i am busy",
-                "i already have insurance",
-                "already have insurance",
-                "no need insurance",
-                "not interested at the moment",
-                "a fine singer",
-                "not need insurance",
-                "not have medicare",
-                "do not need insurance",
-            ],
-            "responses": ["ok thanks for your time, have a great day"],
-            "context": [""],
-        },
-        {
-            "tag": "DNC",
-            "patterns": [
-                "fuck off",
-                "stop calling",
-                "stop calling me",
-                "get the fuck out, I do not want you talking to me",
-                "you're an idiot, who the fuck care if you live or die, go to hell",
-                "scammers",
-                "don't be a fool",
-                "leave me alone, I do not want your calls anymore",
-                "go to hell",
-                "shut up",
-                "take me off your list",
-                "not interested",
-                "no i d like for you not to call me ever again",
-                "nope i ve gotten insurance",
-                "take me off the list how about that",
-                "fucker",
-                "mother fucker",
-                "fuck yourself",
-                "bitch",
-                "whore",
-                "suck my dick",
-                "dick",
-                "fuck",
-            ],
-            "responses": ["ok I'll put you on dnc list"],
-            "context": [""],
-        },
-        {
-            "tag": "YES",
-            "patterns": [
-                "have disability",
-                "yes",
-                "yes",
-                "cool",
-                "cool",
-                "fine",
-                "more",
-                "okay",
-                "sure",
-                "yeah",
-                "how much",
-                "how",
-                "great",
-                "how are you",
-                "ah yes",
-                "correct",
-                "oh fine",
-                "ok fine",
-                "you can",
-                "go ahead",
-                "ofcourse",
-                "yes i do",
-                "i want it",
-                "i think so",
-                "i think yes",
-                "ok go ahead",
-                "yeah go ahead",
-                "i will love to",
-                "lets go for it",
-                "yes thats fine",
-                "I am doing good",
-                "i can do it now",
-                "okay talk to me",
-                "i am doing great",
-                "ok transfer my call",
-                "i'm good how are you",
-                "i'm very well thanks",
-                "ok can u transfer now",
-                "i'm fine what you need",
-                "not too bad how are you",
-                "i'm fine what do you need",
-                "who are you",
-                "what is your name",
-                "what is your company name",
-                "who is this",
-                "tell me about you",
-                "what's your company name",
-                "from where you are calling",
-                "which company you are from",
-                "tell me about company ",
-                "what you guys do",
-                "hello",
-                "oh hi",
-                "oh hello",
-                "hi there",
-                "i can't hear you",
-                "what are you saying",
-                "can you repeat",
-                "sorry what",
-                "what is this",
-                "what",
-                "more",
-                "who",
-                "who are you calling",
-                "why are you calling me",
-                "why",
-                "what is purpose",
-                "what can i do for you",
-                "what a disregard",
-                "what is this regarding",
-                "what is this about",
-                "where",
-                "where are you from",
-                "can i apply for insurance my age is 60",
-                "my age is 60 can i apply",
-                "montly cost",
-                "is there",
-                "i need insurance",
-                "already have medicare",
-                "i have part",
-                "i have part a",
-                "i have part b",
-                "i have both",
-                "yes I have",
-                "i have medicare",
-                "i think i have ",
-                "not too bad",
-                "need insurance",
-            ],
-            "responses": [
-                "ok please hold while i transfer your call",
-                "ok transferring your call to enrollment specialist",
-                "ok wait while i connect to you for more options",
-            ],
-            "context": [""],
-        },
-    ]
-}
+# Pattern Json Input
+json_intents = {}
+with open("pattern.json", "r") as json_file:
+    json_intents = json.load(json_file)
 
-
+# Flask App Setting
 app = Flask(__name__)
 CORS(app)
 
+# Bot 2 Question Sentences
 gretting_question = "Hi this is name from healthcare benefit. How are you today?"
 medicare_question = "I'm calling because the updated plan for Medicare has been released and it may give you some better access to things like dental vision hearing and over-the-counter benefits. Now I believe you do have Medicare part a and B correct?"
 
 
-def analyze_sentiment(text):
-    sentiment_score = sid.polarity_scores(text)
-    return sentiment_score["compound"]
-
-
-def find_intent(sentence):
+# Pattern Matching Intent Analysis
+def find_pattern(sentence):
     for intent_data in json_intents["intents"]:
         for pattern in intent_data["patterns"]:
             if pattern.lower() in sentence.lower():
@@ -306,6 +45,13 @@ def find_intent(sentence):
     return "not exist"
 
 
+# NLTK's sentiment Analysis Model using
+def analyze_sentiment(text):
+    sentiment_score = sid.polarity_scores(text)
+    return sentiment_score["compound"]
+
+
+# DNC Specification
 def indentify_dnc(sentence):
     if "not" in sentence and "call" in sentence:
         return True
@@ -317,16 +63,22 @@ def indentify_dnc(sentence):
     get_intent_from_question_response
 
 
+# Verify that The Language is english or not.
 def is_english_string(input_string):
     english_chars = re.compile(r"^[a-zA-Z0-9\s]+$")
     return bool(english_chars.match(input_string))
 
 
-def get_age(response):
-    prompt = f"""
-      Your task is to find out the age from the following sentence. if the age is not mentioned in the following sentence, the answer is 'not mentioned'.
-      {response}
-    """
+# Removing Sentence Symbols
+def remove_sentence_symbols(input_string):
+    sentence_symbols = [".", "!", "?", ","]
+    for symbol in sentence_symbols:
+        input_string = input_string.replace(symbol, "")
+    return input_string
+
+
+# Get response from openai chatgpt
+def get_chatgpt_response(prompt):
     res = openai.Completion.create(
         engine="text-davinci-002",
         prompt=prompt,
@@ -336,30 +88,33 @@ def get_age(response):
         n=1,
         stream=False,
     )
-    intent = res["choices"][0]["text"].strip()
+    answer = res["choices"][0]["text"].strip()
+    return answer
+
+
+# Getting The client's age (openai chatgpt used because the customer's response is variety)
+def get_age(response):
+    prompt = f"""
+      Your task is to find out the age from the following sentence. if the age is not mentioned in the following sentence, the answer is 'not mentioned'.
+      "{response}
+    """
+    intent = get_chatgpt_response(prompt)
     return intent
 
 
+#  Verify that the customer has got disability
 def get_disability(response):
     prompt = f"""
       Your task is to find out the man who is speaking the following sentence have disability or not. 
       if have disbility, the answer is 'YES', if else, the answer is 'NO'.
       sentence: {response}
     """
-    res = openai.Completion.create(
-        engine="text-davinci-002",
-        prompt=prompt,
-        max_tokens=100,
-        stop=None,
-        temperature=0.2,
-        n=1,
-        stream=False,
-    )
-    intent = res["choices"][0]["text"].strip()
+    intent = get_chatgpt_response(prompt)
     return intent
 
 
-def get_intent(question, response):
+#  Getting Last Chatgpt Part
+def get_last_chatgpt_intent(question, response):
     answer = get_age(response)
 
     prompt = f"""
@@ -398,87 +153,97 @@ def get_intent(question, response):
       { {'intent': 'category'} }
       """
 
-    response = openai.Completion.create(
-        engine="text-davinci-002",
-        prompt=prompt,
-        max_tokens=100,
-        stop=None,
-        temperature=0.2,
-        n=1,
-        stream=False,
-    )
-    intent = response["choices"][0]["text"].strip()
-
+    intent = get_chatgpt_response(prompt)
     return intent
 
 
-def assign_intent_with_sentiment(question, response):
-    # Getting Question and Request
+# Special Part
+def get_intent_in_special_case(lower):
+    if "hi" == lower:
+        return "YES"
+    if "not" in lower:
+        return "NO"
+    elif "no" in lower:
+        return "NO"
+    else:
+        return "NO SPEC"
+
+
+# Making Logs
+def make_logs(question, response, intent):
+    print(question, response)
+
+
+# Caching responses
+def caching_intents(question, response, intent):
+    print(response, intent)
+
+
+# Getting Total Intent
+def get_total_intent(question, response):
+    # ------------------- Response Preprocessing For Specification case --------------------------------------
+    # Some times (cant == can't)
     if " cant " in response:
         response.replace(" cant ", " can not ")
+    # Replave 've to have
     response.replace("'ve", " have")
+    # Replace 't to not
+    response = response.replace("'t", " not")
 
+    # The customer's response is English or not
     if is_english_string(response) == False:
         return "LB"
+    # lower the response
     lower = response.lower()
 
-    # Intent Pattern Monitoring
-    if "no problem" in lower:
-        return "YES"
-    elif "later" in lower:
-        return "CB"
-    # elif "have disability" in lower:
-    #     return "YES"
-
-    intent = find_intent(lower)
+    # ------------------- Getting Intent  --------------------------------------
+    # Maching Pattern -----------------------------
+    intent = find_pattern(lower)
     if intent != "not exist":
         return intent
 
-    # dnc indentify specifically
+    # dnc indentify exact specifically ----------------------------
     dnc = indentify_dnc(response)
     if dnc == True:
         return "DNC"
 
-    # Sentiment Analysis
+    # Sentiment Analysis -----------------------------
     sentiment_score = analyze_sentiment(lower)
-    if "hi" == lower:
-        return "YES"
-    elif "bye" in lower:
-        return "NO"
-    if "not" in lower:
-        return "NO"
+
+    # Specific Intent >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+    specific_intent = get_intent_in_special_case(lower)
+    if specific_intent != "NO SPEC":
+        return specific_intent
+    # Sentiment Analysis Part: if the score > 0.2, the sentiment is good : YES >>>>>>>>>>>>>>
     elif sentiment_score >= 0.2:
         return "YES"
-    elif "no" in lower:
-        return "NO"
     else:
-        # Getting age
+        # I have used Chatgpt in the last for saving openai tokens -----------------------------------
+        # Getting age > 60 or not
         answer = get_age(response)
         if answer != "not mentioned":
             age = int(answer)
             if age >= 60:
                 return "YES"
+        # Getting disability or not >>>>>>>>>>>>>>>>>>>>>
         if get_disability(response) == "YES":
             return "YES"
 
-        intent = get_intent(question, lower)
+        # Getting intent from LAST chatgpt part >>>>>>>>>>>>>>>>>>>
+        intent = get_last_chatgpt_intent(question, lower)
+
         intent = intent.replace("'", '"')
         data = json.loads(intent)
         intent_value = data["intent"]
         if intent_value != "fallback":
             return intent_value
+        # If the sentiment is not Good >>>>>>>>>>>>>>>>>>>>>
         if sentiment_score <= -0.2:
-            return "no"
-        return "fallback"
+            return "NO"
+        return "FALLBACK"
 
 
-def remove_sentence_symbols(input_string):
-    sentence_symbols = [".", "!", "?", ","]
-    for symbol in sentence_symbols:
-        input_string = input_string.replace(symbol, "")
-    return input_string
-
-
+# GUI Part
 @app.route("/", methods=["GET", "POST"])
 def sentiment():
     if request.method == "POST":
@@ -487,40 +252,51 @@ def sentiment():
         print(response)
 
         response_temp = response
-
+        # Question Exchangin
         question = ""
         if question_type == "gretting":
             question = gretting_question
         else:
             question = medicare_question
+        # Remove Sentence Symbols
         response = remove_sentence_symbols(response)
-        response = response.replace("'t", " not")
-        intent = assign_intent_with_sentiment(question, response)
+        intent = get_total_intent(question, response)
         print(intent)
+
+        # Make Log and cache
+        make_logs(question, response, intent)
+        caching_intents(question, response, intent)
 
         return jsonify({"response": response_temp, "intent": intent})
     return render_template("index.html")
 
 
+# API Request Part : GET Request
 @app.route("/api", methods=["GET"])
 def sentiment1():
     question_type = request.args.get("question")
     response = request.args.get("response")
     if question_type != "" and response != "":
         response_temp = response
+        print(response)
 
+        # Question Exchanging
         question = ""
         if question_type == "greeting":
             question = gretting_question
         else:
             question = medicare_question
-        response = response.replace("'t", " not")
-        intent = assign_intent_with_sentiment(question, response)
+        intent = get_total_intent(question, response)
+
+        # Make Log and cache
+        make_logs(request, response, intent)
+        caching_intents(request, response, intent)
 
         return jsonify({"response": response_temp, "intent": intent})
     else:
         return "Please input exactly."
 
 
+# Running Flask App
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=5000, debug=True)
