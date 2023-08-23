@@ -5,14 +5,25 @@ from flask_cors import cross_origin
 import os
 import json
 import re
-import nltk
-from nltk.sentiment import SentimentIntensityAnalyzer
+import string
 from dotenv import load_dotenv
 
 # NLTK's Pretrained Model import
+import nltk
+
 load_dotenv()
 nltk.download("vader_lexicon")
+nltk.download("wordnet")
+nltk.download("punkt")
+
+from nltk.sentiment import SentimentIntensityAnalyzer
+
 sid = SentimentIntensityAnalyzer()
+
+# Wordlemmatizer Preprocessing
+from nltk.stem import WordNetLemmatizer
+
+lemmatizer = WordNetLemmatizer()
 
 import openai
 
@@ -38,6 +49,7 @@ medicare_question = "I'm calling because the updated plan for Medicare has been 
 def find_pattern(sentence):
     for intent_data in json_intents["intents"]:
         for pattern in intent_data["patterns"]:
+            pattern = clean_string(pattern)
             if pattern.lower() in sentence.lower():
                 matches = re.findall(pattern, sentence)
                 if matches:
@@ -67,14 +79,6 @@ def indentify_dnc(sentence):
 def is_english_string(input_string):
     english_chars = re.compile(r"^[a-zA-Z0-9\s]+$")
     return bool(english_chars.match(input_string))
-
-
-# Removing Sentence Symbols
-def remove_sentence_symbols(input_string):
-    sentence_symbols = [".", "!", "?", ","]
-    for symbol in sentence_symbols:
-        input_string = input_string.replace(symbol, "")
-    return input_string
 
 
 # Get response from openai chatgpt
@@ -179,9 +183,23 @@ def caching_intents(question, response, intent):
     print(response, intent)
 
 
+# Clean string
+def clean_string(string):
+    tokens = nltk.word_tokenize(response)
+    words = [
+        lemmatizer.lemmatize(word.lower())
+        for word in tokens
+        if word not in string.punctuation
+    ]
+    response = " ".join(words)
+    return response
+
+
 # Getting Total Intent
 def get_total_intent(question, response):
-    # ------------------- Response Preprocessing For Specification case --------------------------------------
+    # ------------------- Response Preprocessing For Specification case -------------------------------------->>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+    # lower the response
+    lower = response.lower()
     # Some times (cant == can't)
     if " cant " in response:
         response.replace(" cant ", " can not ")
@@ -189,14 +207,16 @@ def get_total_intent(question, response):
     response.replace("'ve", " have")
     # Replace 't to not
     response = response.replace("'t", " not")
+    # Lemmatize all the words and
+    # if the words don't appear in punctuation
+    clean_string(response)
+    print("Processed:" + response)
 
     # The customer's response is English or not
     if is_english_string(response) == False:
         return "LB"
-    # lower the response
-    lower = response.lower()
 
-    # ------------------- Getting Intent  --------------------------------------
+    # ------------------- Getting Intent  -------------------------------------->>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
     # Maching Pattern -----------------------------
     intent = find_pattern(lower)
     if intent != "not exist":
@@ -210,7 +230,7 @@ def get_total_intent(question, response):
     # Sentiment Analysis -----------------------------
     sentiment_score = analyze_sentiment(lower)
 
-    # Specific Intent >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+    # Specific Intent >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
     specific_intent = get_intent_in_special_case(lower)
     if specific_intent != "NO SPEC":
         return specific_intent
@@ -259,7 +279,6 @@ def sentiment():
         else:
             question = medicare_question
         # Remove Sentence Symbols
-        response = remove_sentence_symbols(response)
         intent = get_total_intent(question, response)
         print(intent)
 

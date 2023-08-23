@@ -46,8 +46,7 @@
         "call at",
         "i am working",
         "am driving",
-        "am working",
-        "wow really"
+        "am working"
       ]
     },
     {
@@ -56,9 +55,10 @@
         "now",
         "nope",
         "i dont want",
+        "no thank",
         "no thanks",
-        "nah",
         "no thank you",
+        "nah",
         "i don't think so",
         "no i dont want",
         "i do not want",
@@ -106,7 +106,6 @@
         "i can't talk in english",
         "no english",
         "sorry no",
-        "wow",
         "i gotta find it on my own",
         "i got a plan",
         "no not at all",
@@ -243,7 +242,8 @@
         "i think i have ",
         "not too bad",
         "need insurance",
-        "no problem"
+        "no problem",
+        "wow really"
       ]
     }
   ]
